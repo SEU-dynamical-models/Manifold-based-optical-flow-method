@@ -1,9 +1,10 @@
-import pickle
 import yaml
-import compute_optical_flow
-import find_sigularity_point
+import pickle
 import pyvista as pv
 
+import compute_optical_flow
+import find_sigularity_point
+import draw_optical_flow_field
 
 if "__main__" == __name__:
     with open("./config/config.yaml", 'r', encoding='UTF-8') as file:
@@ -52,6 +53,8 @@ if "__main__" == __name__:
     print("结点个数：", len(surface.points))
     print("三角形面片个数：", len(triangles))
 
+
+    ############################################### 计算光流场 ###############################################
     a2, grad_w, e, integral_wi_wj, execution_time = compute_optical_flow.compute_geometrical_quantities(
         coordinates, 
         normals, 
@@ -59,7 +62,6 @@ if "__main__" == __name__:
         areas
     )
     print("a2, grad_w, e, integral_wi_wj计算完成,花费时间为: ", execution_time)
-
     V_k, execution_time = compute_optical_flow.compute_velocity_field(
         processes_num, 
         time_steps, 
@@ -81,17 +83,15 @@ if "__main__" == __name__:
     compute_optical_flow.reshape_and_save_data(e, e_path)  # 保存正交基底e
     compute_optical_flow.reshape_and_save_data(V_k, V_k_path)  # 保存速度场V_k
 
+
+    ############################################### 检测临界点 ###############################################
     V_k_coord = find_sigularity_point.process_V_k(V_k, e)
-
-
-
     singularity_points = find_sigularity_point.find_singularity_points_for_all_Vk(
         V_k_coord, 
         coordinates, 
         triangles, 
         eps
     )
-
     # singularity_points, classification = find_sigularity_point.find_singularity_points_and_classify_for_all_Vk(
     #     V_k_coord, 
     #     coordinates, 
@@ -100,14 +100,14 @@ if "__main__" == __name__:
     #     surface, 
     #     e
     # )
-
-    # print(classification)
-    
-    print(singularity_points)
     with open(singularity_points_path, 'wb') as file:
         pickle.dump(singularity_points, file)
 
-    # find_sigularity_point.analyze_classification(classification)
+    ############################################### 绘制光流场 ###############################################
+    draw_optical_flow_field.plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points)
+
+
+    
 
 
     ################################# 模拟数据计算真实临界点和检测临界点的位移误差(测地距离) #################################

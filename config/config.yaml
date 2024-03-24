@@ -1,8 +1,4 @@
-# root: E:/毕设数据/ds004194_Visual_ECoG_dataset
-# save_root: E:/毕设数据/wangxi/processed_open_data
-# ecog_names_path: ./derivatives/ecog_names.csv
-# reconstructed_surface_path: ./reconstructed_surface
-# 通用参数
+################################# 通用参数 #################################
 general:
   lambda_      : 0.01   # 光流法正则化参数(速度场平滑项参数)
   eps          : 0.0001     # 判断速度是否为0的误差
@@ -33,7 +29,8 @@ sub_01:
   singularity_points_path: './results/sub-01/sub-p01_singularity_points.pkl' # 检测到的临界点保存路径
 
 
-
-
-# 真实数据参数  
+# root: E:/毕设数据/ds004194_Visual_ECoG_dataset
+# save_root: E:/毕设数据/wangxi/processed_open_data
+# ecog_names_path: ./derivatives/ecog_names.csv
+# reconstructed_surface_path: ./reconstructed_surface
 

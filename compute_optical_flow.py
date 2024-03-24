@@ -178,7 +178,7 @@ def compute_velocity_field(processes_num, time_steps, a2, grad_w, e,
         for v in V_k_processes:
             V_k.append(v.get())
 
-        print(V_k)
+        # print(V_k)
     return V_k, execution_time
 
 
