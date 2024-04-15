@@ -117,7 +117,7 @@ def plot_velocity_fields_and_singularity_points(surface, singularity_points, pot
 
 
 # 在曲面上绘制速度场和临界点的动态 GIF 图像
-def plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points):
+def plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, velocity_fields_gif_path):
     """
     在曲面上绘制速度场和临界点的动态 GIF 图像
     
@@ -139,7 +139,7 @@ def plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coo
 
     # 创建 GIF 动画绘制器
     p = pv.Plotter()
-    p.open_gif('velocity_fields.gif')
+    p.open_gif(velocity_fields_gif_path)
 
     # 添加第一帧的速度场和临界点
     surface['Potentials'] = potentials[0]
@@ -176,7 +176,7 @@ def plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coo
     p.close()
 
 
-def plot_velocity_fields_and_singularity_points_and_true_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, true_singularity_points):
+def plot_velocity_fields_and_singularity_points_and_true_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, true_singularity_points, velocity_fields_gif_path):
     """
     在曲面上绘制速度场、临界点和真实临界点的动态 GIF 图像
     
@@ -199,7 +199,7 @@ def plot_velocity_fields_and_singularity_points_and_true_singularity_points_gif(
     
     # 创建 GIF 动画绘制器
     p = pv.Plotter()
-    p.open_gif('velocity_fields.gif')
+    p.open_gif(velocity_fields_gif_path)
 
     # 添加第一帧的速度场、临界点和真实临界点
     surface['Potentials'] = potentials[0]
@@ -251,11 +251,12 @@ if "__main__" == __name__:
     # time_steps    = general_params['time_steps'] # 时间步数
     # processes_num = general_params['processes_num']  # 进程池大小
 
-    surface_path            = data_params['surface_path']  # 三角剖分的表面文件路径
-    potentials_path         = data_params['potentials_path']  # 电势数据文件路径
-    e_path                  = data_params['e_path']  # 基底向量保存路径
-    V_k_path                = data_params['V_k_path']  # 速度场保存路径
-    singularity_points_path = data_params['singularity_points_path']  # 检测到的临界点保存路径
+    surface_path             = data_params['surface_path']  # 三角剖分的表面文件路径
+    potentials_path          = data_params['potentials_path']  # 电势数据文件路径
+    e_path                   = data_params['e_path']  # 基底向量保存路径
+    V_k_path                 = data_params['V_k_path']  # 速度场保存路径
+    singularity_points_path  = data_params['singularity_points_path']  # 检测到的临界点保存路径
+    velocity_fields_gif_path = data_params['velocity_fields_gif_path']  # 光流场绘制保存路径
 
     # e_path          = './optical_flow/e.csv'
     # V_k_path        = './optical_flow/V_k.csv'
@@ -285,9 +286,9 @@ if "__main__" == __name__:
     # plot_velocity_fields_and_singularity_points(surface, singularity_points, potential, velocity, plot_type='Raw')
 
     # 绘制k个时刻的速度场和临界点,并保存为gif
-    plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points)
+    plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, velocity_fields_gif_path)
 
     # 绘制k个时刻的速度场、临界点以及真实临界点,并保存为gif
     # with open(true_singularity_points_path, 'rb') as file:
     #     true_singularity_points = pickle.load(file)
-    # plot_velocity_fields_and_singularity_points_and_true_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, true_singularity_points)
+    # plot_velocity_fields_and_singularity_points_and_true_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, true_singularity_points, velocity_fields_gif_path)

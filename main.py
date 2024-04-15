@@ -18,12 +18,13 @@ if "__main__" == __name__:
     time_steps    = general_params['time_steps'] # 时间步数
     processes_num = general_params['processes_num']  # 进程池大小
 
-    surface_path            = data_params['surface_path']  # 三角剖分的表面文件路径
-    potentials_path         = data_params['potentials_path']  # 电势数据文件路径
-    e_path                  = data_params['e_path']  # 基底向量保存路径
-    V_k_path                = data_params['V_k_path']  # 速度场保存路径
-    processed_surface_path  = data_params['processed_surface_path']  # 几何相关数信息保存路径
-    singularity_points_path = data_params['singularity_points_path']  # 检测到的临界点保存路径
+    surface_path             = data_params['surface_path']  # 三角剖分的表面文件路径
+    potentials_path          = data_params['potentials_path']  # 电势数据文件路径
+    e_path                   = data_params['e_path']  # 基底向量保存路径
+    V_k_path                 = data_params['V_k_path']  # 速度场保存路径
+    processed_surface_path   = data_params['processed_surface_path']  # 几何相关数信息保存路径
+    singularity_points_path  = data_params['singularity_points_path']  # 检测到的临界点保存路径
+    velocity_fields_gif_path = data_params['velocity_fields_gif_path']  # 光流场绘制保存路径
 
     # surface_path                 = data_params['surface_path']
     # potentials_path              = data_params['potentials_path']
@@ -84,6 +85,7 @@ if "__main__" == __name__:
     compute_optical_flow.reshape_and_save_data(V_k, V_k_path)  # 保存速度场V_k
 
 
+
     ############################################### 检测临界点 ###############################################
     V_k_coord = find_sigularity_point.process_V_k(V_k, e)
     singularity_points = find_sigularity_point.find_singularity_points_for_all_Vk(
@@ -103,11 +105,12 @@ if "__main__" == __name__:
     with open(singularity_points_path, 'wb') as file:
         pickle.dump(singularity_points, file)
 
+
+
     ############################################### 绘制光流场 ###############################################
-    draw_optical_flow_field.plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points)
+    draw_optical_flow_field.plot_velocity_fields_and_singularity_points_gif(surface, potentials, V_k_coord, singularity_points, velocity_fields_gif_path)
 
 
-    
 
 
     ################################# 模拟数据计算真实临界点和检测临界点的位移误差(测地距离) #################################

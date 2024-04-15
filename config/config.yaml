@@ -21,12 +21,13 @@ general:
 
 ################################# 真实数据参数 #################################
 sub_01:
-  surface_path           : './reconstructed_surface/sub-p01_reconstructed_surface.ply' # 三角剖分的表面文件路径
-  potentials_path        : './interpolation_data/sub-p01_ses-umcuiemu01_task-prf_acq-clinical_run-01_ieeg.csv' # 电势数据文件路径
-  e_path                 : "./results/sub-01/sub-p01_e.csv" # 基底向量保存路径
-  V_k_path               : "./results/sub-01/sub-p01_V_k.csv" # 速度场保存路径
-  processed_surface_path : './results/sub-01/sub-p01_processed_surface_arrays.npz' # 几何相关数信息保存路径
-  singularity_points_path: './results/sub-01/sub-p01_singularity_points.pkl' # 检测到的临界点保存路径
+  surface_path            : './reconstructed_surface/sub-p01_reconstructed_surface.ply'  # 三角剖分的表面文件路径
+  potentials_path         : './interpolation_data/sub-p01_ses-umcuiemu01_task-prf_acq-clinical_run-01_ieeg.csv'  # 电势数据文件路径
+  e_path                  : "./results/sub-01/sub-p01_e.csv"  # 基底向量保存路径
+  V_k_path                : "./results/sub-01/sub-p01_V_k.csv"  # 速度场保存路径
+  processed_surface_path  : './results/sub-01/sub-p01_processed_surface_arrays.npz'  # 几何相关数信息保存路径
+  singularity_points_path : './results/sub-01/sub-p01_singularity_points.pkl'  # 检测到的临界点保存路径
+  velocity_fields_gif_path: './results/sub-01/velocity_fields.gif'  # 光流场绘制保存路径
 
 
 # root: E:/毕设数据/ds004194_Visual_ECoG_dataset
