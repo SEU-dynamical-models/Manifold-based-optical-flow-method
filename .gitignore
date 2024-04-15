@@ -3,3 +3,6 @@ test*
 /reconstructed_surface
 /results
 /data
+/__pycache__
+*.pyc
+

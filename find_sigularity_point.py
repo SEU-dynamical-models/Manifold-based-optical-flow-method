@@ -505,15 +505,16 @@ def analyze_classification(classification):
     focus_count = 0
     saddle_count = 0
     node_count = 0
-    for point_type in classification:
-        if point_type == "Focus":
-            focus_count += 1
-        elif point_type == "Saddle":
-            saddle_count += 1
-        else:
-            node_count += 1
+    for classi in classification:
+        for point_type in classi:
+            if point_type == "Focus":
+                focus_count += 1
+            elif point_type == "Saddle":
+                saddle_count += 1
+            else:
+                node_count += 1
 
-    print(f"Total singularity points: {len(classification)}")
+    # print(f"Total singularity points: {len(classification)}")
     print(f"Focus: {focus_count}")
     print(f"Saddle: {saddle_count}")
     print(f"Node: {node_count}")
