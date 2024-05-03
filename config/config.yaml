@@ -30,6 +30,17 @@ sub_01:
   velocity_fields_gif_path: './results/sub-01/velocity_fields.gif'  # 光流场绘制保存路径
 
 
+sub_08:
+  surface_path            : 'data/sub-p08/ses-nyuecog01/preprocessed_data/sub-p08_reconstructed_surface.ply'  # 三角剖分的表面文件路径
+  potentials_path         : 'data/sub-p08/ses-nyuecog01/preprocessed_data/trials_potentials/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01_potentials.csv'  # 电势数据文件路径
+  e_path                  : "data/sub-p08/ses-nyuecog01/optical_flow/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01/e.csv"  # 基底向量保存路径
+  V_k_path                : "data/sub-p08/ses-nyuecog01/optical_flow/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01/V_k.csv"  # 速度场保存路径
+  processed_surface_path  : 'data/sub-p08/ses-nyuecog01/optical_flow/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01/sub-p01_processed_surface_arrays.npz'  # 几何相关数信息保存路径
+  singularity_points_path : 'data/sub-p08/ses-nyuecog01/optical_flow/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01/singularity_points.pkl'  # 检测到的临界点保存路径
+  singularity_points_classification_path : 'data/sub-p08/ses-nyuecog01/optical_flow/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01/singularity_points_classification.pkl'
+  velocity_fields_gif_path: 'data/sub-p08/ses-nyuecog01/optical_flow/sub-p08_ses-nyuecog01_task-prf_acq-clinical_run-01_VERTICAL-L-R-1_01/velocity_fields.gif'  # 光流场绘制保存路径
+
+
 # root: E:/毕设数据/ds004194_Visual_ECoG_dataset
 # save_root: E:/毕设数据/wangxi/processed_open_data
 # ecog_names_path: ./derivatives/ecog_names.csv
