@@ -9,9 +9,11 @@ The variance percentage contribution of different modes is then calculated and t
 """
 from matplotlib import pyplot as plt
 import numpy as np
-import final_draw_optical_flow_field
+from utils import draw_optical_flow_field
 import yaml
 import pyvista as pv
+
+
 
 
 def process_V_k_to_complex(V_k):
@@ -175,10 +177,10 @@ if "__main__" == __name__:
 
 
     # 处理数据
-    e          = final_draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
-    V_k        = final_draw_optical_flow_field.load_data(V_k_path)
+    e          = draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
+    V_k        = draw_optical_flow_field.load_data(V_k_path)
     V_k_coord  = process_V_k_to_complex(V_k)
-    potentials = final_draw_optical_flow_field.load_data(potentials_path)
+    potentials = draw_optical_flow_field.load_data(potentials_path)
 
 
     # SVD分解

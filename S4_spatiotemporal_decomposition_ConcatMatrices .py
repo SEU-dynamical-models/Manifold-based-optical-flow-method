@@ -1,7 +1,8 @@
 from matplotlib import pyplot as plt
 import mne
 import numpy as np
-import draw_optical_flow_field
+from utils import draw_optical_flow_field
+
 import pyvista as pv
 
 def process_V_k_to_complex(V_k):

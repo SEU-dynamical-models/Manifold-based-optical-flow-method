@@ -9,7 +9,7 @@ This code aims to extract streamlines from a velocity field defined in manifold 
 import pickle
 import numpy as np
 import yaml
-import final_draw_optical_flow_field
+from utils import draw_optical_flow_field
 import pyvista as pv
 import bz2
 # import hdf5storage as hdf
@@ -246,10 +246,10 @@ if "__main__" == __name__:
     # singularity_points_classification_path = data_params['singularity_points_classification_path']
 
     # 加载数据
-    e          = final_draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
-    V_k        = final_draw_optical_flow_field.load_data(V_k_path)
-    V_k_coord  = final_draw_optical_flow_field.process_V_k(V_k, e)
-    potentials = final_draw_optical_flow_field.load_data(potentials_path)
+    e          = draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
+    V_k        = draw_optical_flow_field.load_data(V_k_path)
+    V_k_coord  = draw_optical_flow_field.process_V_k(V_k, e)
+    potentials = draw_optical_flow_field.load_data(potentials_path)
     surface = pv.read(surface_path)
 
     # 批量提取每一帧的流线并保存
