@@ -1,3 +1,15 @@
+# Calculating velocity fields from ECoG data using optical flow method
+# Author: Xi Wang
+# Date: April 25, 2024
+# Email: 2308180834@qq.com
+"""
+This code uses variational methods to calculate optical flow fields from ECoG data using finite element discretization. Key steps include:
+- Load surface and interpolated potential data from files.
+- Use the finite element method to calculate the quantities of variation problems (a2 matrix, basis function gradient, orthogonal basis, integral term).
+- A parallel approach is used to calculate the velocity field for multiple time steps.
+- Save the velocity field and orthogonal basis to CSV files.
+The code reads configuration parameters from a YAML file and utilizes multiple processes to speed up calculations.
+"""
 from multiprocessing import Pool
 import os
 import time
@@ -309,17 +321,21 @@ def reshape_and_save_data(data, file_path):
 
 
 if "__main__" == __name__:
-    with open("./config/config.yaml", 'r', encoding='UTF-8') as file:
+    with open("./config/opticalflow.yaml", 'r', encoding='UTF-8') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
-    surface_path           = config['surface_path']
-    potentials_path        = config['potentials_path']
-    file_path_e            = config['e_path']
-    file_path_V_k          = config['V_k_path']
-    processed_surface_path = config['processed_surface_path']
-    time_steps             = config['time_steps']
-    processes_num          = config['processes_num']  # 进程数
-    lambda_                = config['lambda_']  # 0.1
+    data_params    = config['sub_08']
+    general_params = config['general']
+
+
+    surface_path           = data_params['surface_path']
+    potentials_path        = data_params['potentials_path']
+    file_path_e            = data_params['e_path']
+    file_path_V_k          = data_params['V_k_path']
+    processed_surface_path = data_params['processed_surface_path']
+    time_steps             = general_params['time_steps']
+    processes_num          = general_params['processes_num']  # 进程数
+    lambda_                = general_params['lambda_']  # 0.1
     # potentials_path_2      = config['potentials_path_2']
 
     surface    = load_surface(surface_path)

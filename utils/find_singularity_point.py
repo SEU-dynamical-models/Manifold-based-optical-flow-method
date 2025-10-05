@@ -1,13 +1,19 @@
+# Singularity detection in velocity field
+# Author: Xi Wang
+# Date: April 27, 2024
+# Email: 2308180834@qq.com
+"""
+This code is designed to detect singularities in the velocity field.
+First load the velocity field and orthogonal basis from csv files, and then identify all singularities in the velocity field.
+It computes the Jacobian matrix for each singularity and classifies singularities based on the trace and determinant of the Jacobian matrix.
+"""
 import json
 import pickle
 import statistics
 import numpy as np
 import pyvista as pv
-import csv
 from matplotlib import pyplot as plt
 import pandas as pd
-import ast
-
 import yaml
 
 # V_k (3, 6202)
@@ -453,7 +459,7 @@ def compute_jacobian_matrix_for_interior(singularity_interior, V_now, surface,
 
     return jacobian_matrix
 
-# 根据雅可比矩阵的特征值,对临界点进行分类
+# 根据雅可比矩阵的迹和行列式,对临界点进行分类
 def classify_critical_point(jacobian_matrix):
     """
     根据雅可比矩阵的特征值,对临界点进行分类。
@@ -715,18 +721,22 @@ def compute_err_for_all_Vk(true_singularity_points, singularity_points,
 
 
 if __name__ == "__main__":
-    with open("./config/config.yaml", 'r', encoding='UTF-8') as file:
+    with open("./config/opticalflow.yaml", 'r', encoding='UTF-8') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
-    e_path                       = config['e_path']
-    V_k_path                     = config['V_k_path']
-    surface_path                 = config['surface_path']
-    potentials_path              = config['potentials_path']
-    eps                          = config['eps']
-    singularity_points_path      = config['singularity_points_path']
-    # true_singularity_points_path = config['true_singularity_points_path']
-    threshold                    = config['threshold']
-    time_steps                   = config['time_steps']
+    data_params    = config['sub_08']
+    general_params = config['general']
+
+    e_path                  = data_params['e_path']
+    V_k_path                = data_params['V_k_path']
+    surface_path            = data_params['surface_path']
+    potentials_path         = data_params['potentials_path']
+    singularity_points_path = data_params['singularity_points_path']
+    eps                     = general_params['eps']
+    time_steps              = general_params['time_steps']
+    # threshold                    = simulated_config['threshold']
+    # true_singularity_points_path = simulated_config['true_singularity_points_path']
+
 
     e           = load_data(e_path).reshape(-1, 2, 3)
     V_k         = load_data(V_k_path)
@@ -751,11 +761,10 @@ if __name__ == "__main__":
         pickle.dump(singularity_points, file)
 
 
-
     # analyze_classification(classification)
 
 
-
+    ###################################### [用于模拟数据] ######################################
     # turning_point = 67
     # err, err_max, err_min, err_stdev, spare_singularity_points_num, missed_singularity_points_num, matched_num = compute_err_for_all_Vk(true_singularity_points, singularity_points, threshold, surface, turning_point)
     # print(f"总的err为{err}, 平均每个时间步长的err为{err / (time_steps - 1)}, 平均每个临界点的err为{err / matched_num}")

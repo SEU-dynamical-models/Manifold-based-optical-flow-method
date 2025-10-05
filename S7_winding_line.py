@@ -5,7 +5,10 @@ import numpy as np
 import yaml
 from functools import partial
 
-import draw_optical_flow_field
+import final_draw_optical_flow_field
+import sys
+import bz2
+
 
 
 # 计算法向量n_i对应切平面的基底
@@ -289,70 +292,107 @@ def calculate_scale_values(surf, singularity_points, winding_numbers_counts, poi
 
     return scale, all_points
 
-def visualize_results(surf, winding_numbers_counts, types, all_points):
-    """
-    可视化结果函数
+# def visualize_results(surf, winding_numbers_counts, types, all_points):
+#     """
+#     可视化结果函数
 
-    参数：
-    surf (pyvista.PolyData)：表示曲面的PyVista PolyData对象
-    winding_numbers_counts (list)：包含每个奇点的绕圈数计数的列表
-    types (list)：包含每个奇点类型的列表（1为节点，-1为鞍）
-    all_points (list)：包含所有点的列表，用于可视化显示
+#     参数：
+#     surf (pyvista.PolyData)：表示曲面的PyVista PolyData对象
+#     winding_numbers_counts (list)：包含每个奇点的绕圈数计数的列表
+#     types (list)：包含每个奇点类型的列表（1为节点，-1为鞍）
+#     all_points (list)：包含所有点的列表，用于可视化显示
 
-    返回：
-    无
+#     返回：
+#     无
 
-    """
-    surf['scale'] = scale
-    max_scale = max(winding_numbers_counts)
-    contours = surf.contour(isosurfaces=np.arange(1.0, float(max_scale) + 1), scalars='scale') # 创建等值面对象contours，使用从1.0到最大比例尺的等间隔值作为等值面的标量值，并使用'scale'标量进行计算
-    p = pv.Plotter()
-    p.add_mesh(contours)
-    p.add_mesh(surf, show_edges=False)
-    # p.add_mesh(pv.PolyData(all_points), color='red', point_size=10)
-    p.show()
+#     """
+#     surf['scale'] = scale
+#     max_scale = max(winding_numbers_counts)
+#     contours = surf.contour(isosurfaces=np.arange(1.0, float(max_scale) + 1), scalars='scale') # 创建等值面对象contours，使用从1.0到最大比例尺的等间隔值作为等值面的标量值，并使用'scale'标量进行计算
+#     p = pv.Plotter()
+#     p.add_mesh(contours)
+#     p.add_mesh(surf, show_edges=False)
+#     # p.add_mesh(pv.PolyData(all_points), color='red', point_size=10)
+#     p.show()
 
 if "__main__" == __name__:
-
-    with open("./config/config.yaml", 'r', encoding='UTF-8') as file:
-            config = yaml.load(file, Loader=yaml.FullLoader)
-
-    data_params = config['sub_08']
-
-    surface_path                           = data_params['surface_path']
-    potentials_path                        = data_params['potentials_path']
-    e_path                                 = data_params['e_path']
-    V_k_path                               = data_params['V_k_path']
-    singularity_points_path                = data_params['singularity_points_path']
-    singularity_points_classification_path = data_params['singularity_points_classification_path']
+    with open("config.yaml", 'r', encoding='UTF-8') as file:
+        config = yaml.load(file, Loader=yaml.FullLoader)
+        
+    data_params = config['sub_01']
+    general_params = config['general']
+    surface_path = data_params['surface_path']
 
 
+    potentials_path = f"/fred/oz284/mc/results/CCEP-sub-01/{sys.argv[1]}/sub_01-{sys.argv[1]}-ave-interpolation_data.csv"
+    e_path = f"/fred/oz284/mc/results/CCEP-sub-01/{sys.argv[1]}/sub_01-{sys.argv[1]}-e.csv"
+    V_k_path = f"/fred/oz284/mc/results/CCEP-sub-01/{sys.argv[1]}/sub_01-{sys.argv[1]}-V_k.csv"
+    singularity_points_path = f"/fred/oz284/mc/results/CCEP-sub-01/{sys.argv[1]}/sub_01-{sys.argv[1]}-singularity_points.pkl"
 
-    e          = draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
-    V_k        = draw_optical_flow_field.load_data(V_k_path)
-    V_k_coord  = draw_optical_flow_field.process_V_k(V_k, e)
-    potentials = draw_optical_flow_field.load_data(potentials_path)
+
+    trial_name = sys.argv[1]
+
+    e          = final_draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
+    V_k        = final_draw_optical_flow_field.load_data(V_k_path)
+    V_k_coord  = final_draw_optical_flow_field.process_V_k(V_k, e)
+    potentials = final_draw_optical_flow_field.load_data(potentials_path)
 
 
     with open(singularity_points_path, 'rb') as file:
         singularity_points = pickle.load(file)
-    with open(singularity_points_classification_path, 'rb') as file:
-        singularity_points_classification = pickle.load(file)
+
 
     surf    = pv.read(surface_path)
     normals = surf.point_normals
     points  = surf.points
     # print(len(points))
 
-    
-    time_index = 64
-    V_now = V_k_coord[time_index]
-    singularity_points = singularity_points[time_index]
-    singularity_points_classification = singularity_points_classification[time_index]
-    print(f"singularity_points:{singularity_points}")
-    print(f"singularity_points_classification:{singularity_points_classification}")
+    sum = 0
+    for x in singularity_points:
+        if len(x) == 0:
+            sum += 1
+            continue
+        print(f"{sum}, {len(x)}")
+        sum += 1
 
-    winding_numbers_counts, types = calculate_winding_numbers(surf, singularity_points, V_now, e, points)
-    scale, all_points = calculate_scale_values(surf, singularity_points, winding_numbers_counts, points)
-    visualize_results(surf, winding_numbers_counts, types, all_points)
+    winding_lines = {}
+
+    time_index = len(singularity_points)
+    for t in range(time_index):
+        winding_line = []
+        singularity_point = singularity_points[t]
+        V_now = V_k_coord[t]
+        if len(singularity_point) == 0:
+            continue
+        winding_numbers_counts, types = calculate_winding_numbers(surf, singularity_point, V_now, e, points)
+        print(t, winding_numbers_counts, types)
+        num = len(winding_numbers_counts)
+
+        sum = 0
+
+        for x in range(num):
+            if (winding_numbers_counts[x] == 0):
+                continue
+            tmp = []
+            tmp.append(singularity_point[x])
+            tmp.append(winding_numbers_counts[x])
+            tmp.append(types[sum])
+            winding_line.append(tmp)
+            sum += 1
+        winding_lines[str(t)] = winding_line
+    
+    sl_fname = f"/fred/oz284/mc/results/CCEP-sub-01/{sys.argv[1]}/sub_01-{sys.argv[1]}-winding_lines.pkl.bz2"
+    with bz2.BZ2File(sl_fname, 'wb') as file:
+        pickle.dump(winding_lines, file)
+
+    # time_index = 0
+    # V_now = V_k_coord[time_index]
+    # singularity_points = singularity_points[time_index]
+
+    # print(f"singularity_points:{singularity_points}")
+
+    # winding_numbers_counts, types = calculate_winding_numbers(surf, singularity_points, V_now, e, points)
+    # print(winding_numbers_counts, types)
+    # # scale, all_points = calculate_scale_values(surf, singularity_points, winding_numbers_counts, points)
+    # # visualize_results(surf, winding_numbers_counts, types, all_points)
 

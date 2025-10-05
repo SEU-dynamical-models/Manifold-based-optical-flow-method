@@ -1,8 +1,17 @@
+# Spatiotemporal mode decomposition of velocity field
+# Author: Xi Wang
+# Date: May 5, 2024
+# Email: 2308180834@qq.com
+"""
+This code performs a spatiotemporal pattern decomposition of the velocity field.
+The velocity data are first processed, converted into a representation in complex form, and then singular value decomposition (SVD) is applied to extract the main spatiotemporal patterns.
+The variance percentage contribution of different modes is then calculated and the extracted modes are visualized by plotting the corresponding velocity fields.
+"""
+from matplotlib import pyplot as plt
 import numpy as np
-import draw_optical_flow_field
+import final_draw_optical_flow_field
 import yaml
 import pyvista as pv
-import pickle
 
 
 def process_V_k_to_complex(V_k):
@@ -91,7 +100,7 @@ def plot_surface_with_velocity_arrows(surface_path, velocity, type='Raw'):
         }
     elif type == 'Scaled':
         # scale设置为相同的数值,速度场仅显示方向,不体现变化大小
-        surface['V_scale'] = np.ones((len(velocity), )) * 2
+        surface['V_scale'] = np.ones((len(velocity), )) * 5
 
         args = {
             'tolerance': 0.01,
@@ -152,28 +161,28 @@ def extract_modes(Sigma, VT, e, k):
 
 if "__main__" == __name__:
     # 读取配置文件
-    with open("./config/config.yaml", 'r', encoding='UTF-8') as file:
+    with open("code/ccep/opticalflow.yaml", 'r', encoding='UTF-8') as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
-    data_params = config['sub_08']
+    data_params = config['sub_01']
 
     surface_path                           = data_params['surface_path']
     potentials_path                        = data_params['potentials_path']
     e_path                                 = data_params['e_path']
     V_k_path                               = data_params['V_k_path']
     singularity_points_path                = data_params['singularity_points_path']
-    singularity_points_classification_path = data_params['singularity_points_classification_path']
+    # singularity_points_classification_path = data_params['singularity_points_classification_path']
 
 
     # 处理数据
-    e          = draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
-    V_k        = draw_optical_flow_field.load_data(V_k_path)
+    e          = final_draw_optical_flow_field.load_data(e_path).reshape(-1, 2, 3)
+    V_k        = final_draw_optical_flow_field.load_data(V_k_path)
     V_k_coord  = process_V_k_to_complex(V_k)
-    potentials = draw_optical_flow_field.load_data(potentials_path)
-    # print(V_k_coord[0])
+    potentials = final_draw_optical_flow_field.load_data(potentials_path)
+
 
     # SVD分解
-    U, Sigma, VT = np.linalg.svd(V_k_coord[51:], full_matrices=1)
+    U, Sigma, VT = np.linalg.svd(V_k_coord, full_matrices=1)
     # print(U.shape, Sigma.shape, VT.shape)
     # print(Sigma)
     
@@ -184,6 +193,57 @@ if "__main__" == __name__:
     print(rounded_percentages_squared)
 
 
-    # 提取主模式
-    k = 4  # 保留前 4 个主模式
-    extract_modes(Sigma, VT, e, k)
+    # # 提取主模式
+    # k = 4  # 保留前 4 个主模式
+    # extract_modes(Sigma, VT, e, k)
+
+    nmodeplot = 4
+    U = U[:,:nmodeplot]
+    Sigma = Sigma[:nmodeplot]
+    VT = VT[:nmodeplot,:]
+    isNegative = np.mean(np.real(U), axis=0) < 0
+
+    # print(U.shape)
+    # print(VT.shape)
+    # print(isNegative)
+    U[:, isNegative] = -U[:, isNegative]
+
+    VT[isNegative, :] = -VT[isNegative, :]
+
+    
+    nt = len(V_k_coord)
+    # Find average trajectory across all trials
+    re_uav = np.zeros((nt, nmodeplot))
+    im_uav = np.zeros((nt, nmodeplot))
+    abs_uav = np.zeros((nt, nmodeplot))
+    for it in range(nt):
+        uav = U[it,:nmodeplot]
+        re_uav[it,:] = np.real(uav)
+        im_uav[it,:] = np.imag(uav)
+        abs_uav[it,:] = np.abs(uav)
+    uav_lims = [np.min([re_uav.ravel(), im_uav.ravel(), abs_uav.ravel()]),
+                    np.max([re_uav.ravel(), im_uav.ravel(), abs_uav.ravel()])]
+    
+
+    # 创建图形对象
+    fig, ax = plt.subplots(figsize=(8, 6))
+    realTime = np.linspace(0.009, 0.2, nt)
+    colors=['blue','green','orange', 'red']
+    for imode in range(nmodeplot):
+        # ax.plot(realTime, re_uav[:, imode], color='blue', label='re_uav')
+        # ax.plot(realTime, im_uav[:, imode], color='green', label='im_uav')
+        ax.plot(realTime, abs_uav[:, imode], color=colors[imode], label=f"Mode {imode + 1}")
+
+    ax.set_ylim(uav_lims)
+    ax.set_xlim([realTime[0], realTime[-1]])
+    # ax.legend(prop={'size': 18})
+    plt.rc("legend", fontsize=10)
+    ax.axvline(0, color='black', linewidth=2.5)
+    ax.axhline(0, color='black')
+    ax.set_xlabel('Time(s)', fontsize=14)
+    ax.set_ylabel('Absolute Value', fontsize=14)  # 'Absolute Value' 'Real Part' 'Imaginary Part'
+    ax.set_title('SVD Modes Evolution', fontsize=16)
+    ax.legend()  # 添加图例
+
+    # 显示图形
+    plt.show()
